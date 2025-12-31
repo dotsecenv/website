@@ -1,4 +1,4 @@
-.PHONY: help install dev start build preview clean distclean favicons
+.PHONY: help install dev start build preview clean distclean favicons lint
 
 # Default target
 help:
@@ -11,6 +11,9 @@ help:
 	@echo "Production:"
 	@echo "  build      Build for production (output to dist/)"
 	@echo "  preview    Preview production build"
+	@echo ""
+	@echo "Quality:"
+	@echo "  lint       Lint MDX files (markdownlint + eslint)"
 	@echo ""
 	@echo "Assets:"
 	@echo "  favicons   Generate favicons from src/assets/logo.png"
@@ -32,6 +35,10 @@ build:
 
 preview:
 	pnpm preview
+
+# Quality
+lint:
+	pnpm lint
 
 # Assets
 favicons:
