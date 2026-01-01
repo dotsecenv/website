@@ -4,6 +4,21 @@ import * as mdx from "eslint-plugin-mdx";
 export default [
   js.configs.recommended,
   {
+    files: ["scripts/**/*.{js,mjs}"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        URL: "readonly",
+      },
+    },
+  },
+  {
     ...mdx.flat,
     processor: mdx.createRemarkProcessor({
       lintCodeBlocks: false,

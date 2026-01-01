@@ -11,9 +11,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "lint": "pnpm lint:md && pnpm lint:mdx",
+    "lint": "pnpm lint:md && pnpm lint:eslint",
     "lint:md": "markdownlint 'src/**/*.{md,mdx}'",
-    "lint:mdx": "eslint 'src/**/*.mdx'"
+    "lint:eslint": "eslint 'src/**/*.mdx' 'scripts/**/*.{js,mjs}'"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.32.0",
