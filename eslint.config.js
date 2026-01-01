@@ -1,5 +1,5 @@
 import js from "@eslint/js";
-import mdx from "eslint-plugin-mdx";
+import * as mdx from "eslint-plugin-mdx";
 
 export default [
   js.configs.recommended,
