@@ -10,11 +10,13 @@ import { Aside } from '@astrojs/starlight/components';
 dotsecenv aligns with several NIST and IETF standards for cryptographic operations. This page documents:
 
 **Compliance Standards** — specify how to use cryptographic primitives securely:
+
 - **FIPS 140-3** — Security requirements for cryptographic modules
 - **FIPS 186-5** — Digital Signature Standard (approved algorithms)
 - **RFC 9580** — OpenPGP with mandatory AEAD encryption
 
 **Foundational Standards** — define the cryptographic primitives themselves:
+
 - **FIPS 197** — Advanced Encryption Standard (AES)
 - **FIPS 180-4** — Secure Hash Standard (SHA-2 family)
 
@@ -94,6 +96,7 @@ The `v1.0.0` identifier is significant:
 | `GOFIPS140=off` | Disables FIPS mode (default) |
 
 Using `v1.0.0` ensures:
+
 - **Validated code path** — The binary uses the exact cryptographic implementation that was formally tested and awarded certificate A6650
 - **Deterministic behavior** — Runtime behavior matches what was audited by Trail of Bits
 - **Compliance evidence** — Auditors can verify the module version matches the NIST validation record
@@ -348,6 +351,7 @@ Hybrid encryption enables efficient multi-recipient encryption:
 | Secret data | Variable | Encrypted once total with AES (fast) |
 
 For 10 recipients, this means:
+
 - **1** AES encryption of the full payload
 - **10** RSA/ECC encryptions of the 256-bit session key
 
