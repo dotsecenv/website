@@ -15,7 +15,7 @@ The dotsecenv shell plugins automatically load secrets from `.secenv` files when
 4. **Auto-load**: Plain variables from `.env` are loaded, then secrets are fetched from your vault
 5. **On `cd` out**: Variables are automatically unset
 
-```
+```text
 ~/project $ cd myapp/
 dotsecenv: found .secenv in /home/user/myapp
 Load secrets? [y]es / [n]o / [a]lways: y
@@ -126,6 +126,7 @@ This is safer than piping to `pbcopy` manually since the secret is never display
 </Aside>
 
 Clipboard support:
+
 - **macOS**: Uses `pbcopy` (built-in)
 - **Wayland**: Uses `wl-copy`
 - **X11**: Uses `xclip` or `xsel`
@@ -139,6 +140,7 @@ reloadsecenv
 ```
 
 This is useful when:
+
 - You've added new secrets to your vault
 - You've modified the `.secenv` file
 - A secret fetch failed and you want to retry
@@ -230,7 +232,7 @@ The plugin uses a trust system to prevent malicious `.secenv` files from auto-lo
 
 When you `cd` into a directory with an untrusted `.secenv`:
 
-```
+```text
 dotsecenv: found .secenv in /path/to/project
 Load secrets? [y]es / [n]o / [a]lways:
 ```
@@ -244,11 +246,13 @@ Load secrets? [y]es / [n]o / [a]lways:
 ### Persistent Trust
 
 Directories trusted with "always" are saved to:
-```
+
+```text
 ~/.config/dotsecenv/trusted_dirs
 ```
 
 To remove trust:
+
 ```bash
 # Edit the file and remove the directory path
 vim ~/.config/dotsecenv/trusted_dirs
@@ -262,12 +266,14 @@ Before loading any file, the plugin performs security checks:
 2. **Permissions**: File must not be world-writable
 
 If a file fails these checks:
-```
+
+```text
 dotsecenv: refusing to load /path/.secenv - not owned by current user or root
 dotsecenv: refusing to load /path/.env - world-writable
 ```
 
 <Aside type="tip" title="Fixing Permissions">
+
 ```bash
 # Fix ownership
 chown $(whoami) .secenv
@@ -275,6 +281,7 @@ chown $(whoami) .secenv
 # Fix permissions (remove world-write)
 chmod o-w .secenv
 ```
+
 </Aside>
 
 ## .secenv File Format
@@ -309,7 +316,8 @@ When both `.env` and `.secenv` exist in a directory:
 </Steps>
 
 If a variable is defined in both files, `.secenv` wins with a warning:
-```
+
+```text
 dotsecenv: warning: DATABASE_URL from .secenv overrides value from .env
 ```
 
@@ -318,16 +326,19 @@ dotsecenv: warning: DATABASE_URL from .secenv overrides value from .env
 ### Secrets not loading on `cd`
 
 1. Check the plugin is loaded:
+
    ```bash
    type reloadsecenv  # Should show it's a function
    ```
 
 2. Verify `.secenv` exists and has correct permissions:
+
    ```bash
    ls -la .secenv
    ```
 
 3. Try manual reload:
+
    ```bash
    reloadsecenv
    ```
@@ -335,10 +346,12 @@ dotsecenv: warning: DATABASE_URL from .secenv overrides value from .env
 ### "No TTY for trust prompt"
 
 The trust prompt requires an interactive terminal. This happens when:
+
 - Running in a script
 - Running in a non-interactive shell
 
 Solution: Pre-trust the directory:
+
 ```bash
 echo "/path/to/project" >> ~/.config/dotsecenv/trusted_dirs
 ```
@@ -346,12 +359,14 @@ echo "/path/to/project" >> ~/.config/dotsecenv/trusted_dirs
 ### Secret fetch errors
 
 If a secret fails to fetch, you'll see:
-```
+
+```text
 dotsecenv: error fetching secret 'SECRET_NAME' for VAR:
 <error details>
 ```
 
 Common causes:
+
 - Secret doesn't exist in vault
 - GPG agent not running
 - Vault locked
