@@ -7,7 +7,7 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 ## Goal
 
-Install and use dotsecenv in GitHub Actions workflows to securely access secrets during CI/CD pipelines.
+Install and use `dotsecenv` in GitHub Actions workflows to securely access secrets in CI/CD pipelines.
 
 ## Prerequisites
 
@@ -56,7 +56,7 @@ Install and use dotsecenv in GitHub Actions workflows to securely access secrets
    ```yaml
          - uses: dotsecenv/dotsecenv@v0
            with:
-             init-config: ''  # Run with defaults
+             init-config: ''  # Initialize with a default config
    ```
 
    <Aside type="tip">
@@ -100,7 +100,7 @@ Install and use dotsecenv in GitHub Actions workflows to securely access secrets
          - name: Build with secrets
            run: |
              dotsecenv version
-             # dotsecenv run -- your-build-command
+             # dotsecenv secret get YOUR_SECRET | ...
    ```
 
 </Steps>
@@ -161,11 +161,11 @@ The `init-config` input controls whether `dotsecenv init config` runs after inst
 
 <Tabs>
   <TabItem label="Skip (default)">
-    Don't run initialization:
+    Don't initialize a configuration file:
 
     ```yaml
     - uses: dotsecenv/dotsecenv@v0
-      # init-config defaults to 'skip'
+      # init-config defaults to 'skip' (which means, it won't be run)
     ```
   </TabItem>
 
@@ -198,7 +198,7 @@ The `init-config` input controls whether `dotsecenv init config` runs after inst
         init-config: '--gpg-program /usr/bin/gpg'
     ```
 
-    Or disable GPG:
+    Or resolve the GPG program at runtime:
 
     ```yaml
     - uses: dotsecenv/dotsecenv@v0
@@ -208,7 +208,7 @@ The `init-config` input controls whether `dotsecenv init config` runs after inst
   </TabItem>
 
   <TabItem label="Login Identity">
-    Set a specific GPG identity:
+    Sets the GPG identity that will attempt to decrypt secrets:
 
     ```yaml
     - uses: dotsecenv/dotsecenv@v0
@@ -272,14 +272,15 @@ The action provides outputs you can use in subsequent steps:
 
 ## Troubleshooting
 
-### "Unsupported OS" or "Unsupported arch" Error
+### "Unsupported OS" or "Unsupported arch" error
 
 The action supports:
 
 - **OS**: Linux, macOS
 - **Architecture**: x86_64 (X64), arm64 (ARM64)
 
-Windows is not currently supported. For unsupported platforms, use `build-from-source: true`.
+Windows is currently being implemented, but is not supported yet
+(see [#8](https://github.com/dotsecenv/dotsecenv/issues/8)).
 
 ### GPG Signature Verification Failed
 
