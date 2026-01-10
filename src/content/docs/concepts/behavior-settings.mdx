@@ -44,7 +44,7 @@ behavior:
 
 When enabled, you'll see:
 
-```
+```shell
 dotsecenv: warning: vault "/path/to/vault" uses format v1, upgrade to v2 recommended
 dotsecenv: run 'dotsecenv vault upgrade' to upgrade the vault format
 ```
@@ -125,23 +125,26 @@ If you currently use `strict: true`, here's how to migrate:
 
 <Tabs>
   <TabItem label="Before">
-```yaml
-# Old configuration
-strict: true
-```
+
+    ```yaml
+    # Old configuration
+    strict: true
+    ```
+
   </TabItem>
   <TabItem label="After">
-```yaml
-# New configuration - choose which behaviors you need
-behavior:
-  require_explicit_vault_upgrade: true
-  fail_on_integrity_error: true
-  require_config_vaults: true
 
-gpg:
-  program: /usr/bin/gpg  # Or PATH
+    ```yaml
+    # New configuration - choose which behaviors you need
+    behavior:
+      require_explicit_vault_upgrade: true
+      fail_on_integrity_error: true
+      require_config_vaults: true
 
-```
+    gpg:
+      program: /usr/bin/gpg  # Or PATH
+    ```
+
   </TabItem>
 </Tabs>
 
