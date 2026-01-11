@@ -187,6 +187,13 @@ unfamiliar with GPG.
 | `--email` | Your email address (prompts if not provided) |
 | `--algo` | Key algorithm: `ED25519`, `RSA4096`, `P384` (default), `P521` |
 | `--template` | Output GPG batch template instead of generating key |
+| `--no-passphrase` | Create key without passphrase protection (for CI/automation only) |
+
+**Key expiration:**
+
+Generated keys expire after **2 years** by default. This is a security best practice - keys should
+be rotated periodically. If you need a different expiration, use `--template` to get the GPG batch
+template and modify the `Expire-Date` field before generating.
 
 **Supported algorithms:**
 
@@ -241,6 +248,9 @@ dotsecenv identity create --algo RSA4096
 dotsecenv identity create --template --name "John Doe" --email "john@example.com"
 # Save this template to a file and run:
 #   gpg --batch --generate-key key-params.txt
+
+# CI/automation: create passwordless key (requires --name and --email)
+dotsecenv identity create --name "CI Bot" --email "ci@example.com" --no-passphrase
 ```
 
 ---
