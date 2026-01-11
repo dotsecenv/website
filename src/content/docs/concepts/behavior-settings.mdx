@@ -20,8 +20,7 @@ Behavior settings are configured in your `~/.config/dotsecenv/config.yaml` file 
 ```yaml
 behavior:
   require_explicit_vault_upgrade: false
-  fail_on_integrity_error: false
-  require_config_vaults: false
+  restrict_to_configured_vaults: false
 ```
 
 ## Available Settings
@@ -49,23 +48,7 @@ dotsecenv: warning: vault "/path/to/vault" uses format v1, upgrade to v2 recomme
 dotsecenv: run 'dotsecenv vault upgrade' to upgrade the vault format
 ```
 
-### `fail_on_integrity_error`
-
-Controls how dotsecenv handles configuration and vault file errors during operations.
-
-| Value | Behavior |
-|-------|----------|
-| `false` (default) | Warns about errors and continues with healthy files |
-| `true` | Fails the operation if any config or vault has errors |
-
-**Use case:** Set to `true` in CI/CD pipelines where you want strict validation.
-
-```yaml
-behavior:
-  fail_on_integrity_error: true
-```
-
-### `require_config_vaults`
+### `restrict_to_configured_vaults`
 
 Controls whether CLI `-v` flags can override vaults specified in the configuration file.
 
@@ -78,7 +61,7 @@ Controls whether CLI `-v` flags can override vaults specified in the configurati
 
 ```yaml
 behavior:
-  require_config_vaults: true
+  restrict_to_configured_vaults: true
 ```
 
 ## Simplified Behaviors
@@ -138,8 +121,7 @@ If you currently use `strict: true`, here's how to migrate:
     # New configuration - choose which behaviors you need
     behavior:
       require_explicit_vault_upgrade: true
-      fail_on_integrity_error: true
-      require_config_vaults: true
+      restrict_to_configured_vaults: true
 
     gpg:
       program: /usr/bin/gpg  # Or PATH
@@ -148,7 +130,7 @@ If you currently use `strict: true`, here's how to migrate:
   </TabItem>
 </Tabs>
 
-The `strict: true` shorthand still works during the deprecation period and is equivalent to setting all three behavior flags to `true`.
+The `strict: true` shorthand still works during the deprecation period and is equivalent to setting both behavior flags to `true`.
 
 ### Hybrid Configuration
 
@@ -185,8 +167,7 @@ approved_algorithms:
 vault:
   - /secure/path/to/vault
 behavior:
-  fail_on_integrity_error: true
-  require_config_vaults: true
+  restrict_to_configured_vaults: true
 gpg:
   program: /usr/bin/gpg
 ```

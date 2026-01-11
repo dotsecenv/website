@@ -654,8 +654,7 @@ fingerprint: E60A1740BAEF49284D22EA7D3C376348F0921C59
 # Behavior settings (all default to false)
 behavior:
   require_explicit_vault_upgrade: false
-  fail_on_integrity_error: false
-  require_config_vaults: false
+  restrict_to_configured_vaults: false
 
 # GPG executable path
 gpg:
@@ -669,8 +668,7 @@ Granular settings that control how dotsecenv handles edge cases. See [Behavior S
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `require_explicit_vault_upgrade` | `false` | Prevent automatic vault format upgrades; requires `vault upgrade` command |
-| `fail_on_integrity_error` | `false` | Fail if any config or vault file has errors (recommended for CI/CD) |
-| `require_config_vaults` | `false` | Ignore CLI `-v` flags; only use vaults from config file |
+| `restrict_to_configured_vaults` | `false` | Ignore CLI `-v` flags; only use vaults from config file |
 
 ### GPG Program Configuration
 
