@@ -40,6 +40,7 @@ A secure tool for managing environment secrets using GPG encryption. Secrets are
 |---------|-------------|
 | `init` | Initialize configuration or vault files |
 | `login` | Initialize user identity |
+| `identity` | Manage GPG identities |
 | `secret` | Manage secrets |
 | `vault` | Manage vaults |
 | `validate` | Validate vault and config |
@@ -122,23 +123,134 @@ dotsecenv init vault -v ~/project/secrets/vault
 
 ## login
 
-Initialize user identity with the given GPG fingerprint.
+Initialize your dotsecenv identity by selecting a GPG key. This creates a cryptographically
+signed proof that you control the secret key, stored in your configuration.
 
 ```bash
-dotsecenv login FINGERPRINT [flags]
+dotsecenv login [FINGERPRINT] [flags]
 ```
 
-The fingerprint should be the full 40-character GPG key fingerprint of the user who will be accessing secrets.
+**Arguments:**
+
+- `FINGERPRINT` (optional): GPG key fingerprint. If not provided, you'll be prompted to
+  select from available secret keys.
+
+**What happens:**
+
+1. Validates the GPG key exists and you have the secret key
+2. Creates a signed login proof (timestamp + fingerprint + signature)
+3. Stores the proof in your configuration file
+
+This signed proof ensures that only someone with access to the secret key can
+configure dotsecenv to use it.
 
 **Examples:**
 
 ```bash
-# Login with specific fingerprint
-dotsecenv login E60A1740BAEF49284D22EA7D3C376348F0921C59
+# Interactive key selection (recommended)
+dotsecenv login
 
-# Auto-detect fingerprint (bash)
-dotsecenv login $(gpg --list-secret-keys --keyid-format long | \
-  grep -oP '(?<=sec\s{3}rsa4096/)[A-F0-9]+' | head -1)
+# Specify fingerprint directly
+dotsecenv login E60A1740BAEF49284D22EA7D3C376348F0921C59
+```
+
+---
+
+## identity
+
+Manage GPG identities.
+
+```bash
+dotsecenv identity [command]
+```
+
+### identity create
+
+Generate a new GPG key for use with dotsecenv.
+
+```bash
+dotsecenv identity create [flags]
+```
+
+This command simplifies GPG key creation by providing sensible defaults
+while allowing customization for power users.
+
+While dotsecenv's philosophy aligns with Unix/POSIX tool composition, we felt that
+providing a simplified wrapper for GPG key generation is a net positive for users
+unfamiliar with GPG.
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--name` | Your full name (prompts if not provided) |
+| `--email` | Your email address (prompts if not provided) |
+| `--algo` | Key algorithm: `ED25519`, `RSA4096`, `P384` (default), `P521` |
+| `--template` | Output GPG batch template instead of generating key |
+| `--no-passphrase` | Create key without passphrase protection (for CI/automation only) |
+
+**Key expiration:**
+
+Generated keys expire after **2 years** by default. This is a security best practice - keys should
+be rotated periodically. If you need a different expiration, use `--template` to get the GPG batch
+template and modify the `Expire-Date` field before generating.
+
+**Supported algorithms:**
+
+| Algorithm | Description |
+|-----------|-------------|
+| `P384` (default) | NIST P-384 ECDSA curve |
+| `P521` | NIST P-521 ECDSA curve |
+| `ED25519` | EdDSA with Ed25519 curve |
+| `RSA4096` | RSA 4096-bit key |
+
+**Algorithm validation:**
+
+The requested algorithm must be allowed by your configuration's `approved_algorithms`
+setting. If you request an algorithm that isn't enabled, you'll see an error:
+
+```text
+Error: algorithm 'ED25519' is not allowed by your configuration
+
+Your config only allows:
+  - ECC (minimum 384 bits, curves: P-384, P-521)
+  - RSA (minimum 2048 bits)
+
+To use ED25519, add it to your config's approved_algorithms.
+See https://dotsecenv.com/concepts/compliance/ for more details.
+```
+
+This ensures that generated keys comply with your organization's cryptographic policies.
+See the [Compliance](/concepts/compliance/) page for more information.
+
+**About the `--template` flag:**
+
+Instead of generating the key directly, output a GPG batch template file. This allows you to:
+
+- Review and customize the template before generation
+- Execute key generation directly with GPG for maximum security
+- Generate the key on an air-gapped machine
+- Reduce attack surface by avoiding secret material handling in dotsecenv
+
+**Examples:**
+
+```bash
+# Interactive key generation with defaults (P384)
+dotsecenv identity create
+
+# Specify name and email via flags
+dotsecenv identity create --name "John Doe" --email "john@example.com"
+
+# Use RSA 4096-bit key (if allowed by config)
+dotsecenv identity create --algo RSA4096
+
+# Output template for manual generation
+dotsecenv identity create --template --name "John Doe" --email "john@example.com"
+# Save this template to a file and run:
+#   gpg --batch --generate-key key-params.txt
+
+# CI/automation: create passwordless key (requires --name and --email)
+dotsecenv identity create --name "CI Bot" --email "ci@example.com" --no-passphrase
 ```
 
 ---
