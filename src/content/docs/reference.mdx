@@ -556,6 +556,29 @@ dotsecenv vault upgrade -v 1
 dotsecenv vault upgrade -v ./project/vault
 ```
 
+### vault upgrade
+
+Upgrade vault file format to the latest version.
+
+```bash
+dotsecenv vault upgrade [flags]
+```
+
+When `behavior.require_explicit_vault_upgrade` is set to `true` in your config, automatic vault upgrades are disabled. Use this command to explicitly upgrade vault formats.
+
+**Examples:**
+
+```bash
+# Upgrade vault (prompts if multiple vaults configured)
+dotsecenv vault upgrade
+
+# Upgrade specific vault
+dotsecenv vault upgrade -v 1
+
+# Upgrade vault at path
+dotsecenv vault upgrade -v ./project/vault
+```
+
 ---
 
 ## validate
