@@ -129,25 +129,27 @@ In SUID mode, dotsecenv blocks write operations to prevent privilege escalation 
 
 ### Automated Secret Exfiltration
 
-AI coding assistants, build scripts, and other automated tools may attempt to read secrets programmatically. The `require_tty_for_decryption` behavior flag blocks decryption unless running in an interactive terminal:
+AI coding assistants, build scripts, and other automated tools may attempt to read secrets programmatically. dotsecenv emits a **warning** when decrypting secrets in non-interactive terminals:
 
-```yaml
-behavior:
-  require_tty_for_decryption: true
+```shell
+warning: decrypting in non-interactive terminal; for better security, configure GPG to require passphrase entry (see gpg-agent.conf)
 ```
 
-With this enabled:
+<Aside type="caution" title="Not a Security Boundary">
+  This warning is for **awareness only**—dotsecenv does not block non-TTY access. TTY detection is trivially bypassed by attackers with code execution (e.g., using `script`, `unbuffer`, or allocating a PTY programmatically).
 
-- Interactive terminal sessions can decrypt secrets normally
-- Piped commands (`echo x | dotsecenv secret get KEY`) are blocked
-- Scripts running without a TTY cannot access secrets
-
-<Aside type="caution" title="Lightweight Protection">
-  This flag raises the bar for automated attacks but is not a complete defense. A determined attacker with code execution could bypass dotsecenv (e.g. using `script` to fake a TTY) or call GPG directly.
-
-**Stronger Mitigation:** Configure GPG to **never cache your passphrase** (`default-cache-ttl 0` and `max-cache-ttl 0` in `gpg-agent.conf`). This forces manual passphrase entry via `pinentry` for every decryption, which most automated tools cannot provide.
-
+  An attacker can also bypass dotsecenv entirely by discovering your GPG key fingerprint from the vault and calling GPG directly.
 </Aside>
+
+**The only robust defense** against automated local secret exfiltration is **user presence verification** via GPG pinentry. Configure your GPG agent to never cache your passphrase:
+
+```ini
+# ~/.gnupg/gpg-agent.conf
+default-cache-ttl 0
+max-cache-ttl 0
+```
+
+This forces manual passphrase entry for every decryption operation, which automated tools cannot provide without higher privileges (e.g., root access or window server access to inject keystrokes).
 
 ### Protecting .secenv Files
 
