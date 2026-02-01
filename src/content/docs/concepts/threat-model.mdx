@@ -141,16 +141,22 @@ With this enabled:
 - Interactive terminal sessions can decrypt secrets normally
 - Piped commands (`echo x | dotsecenv secret get KEY`) are blocked
 - Scripts running without a TTY cannot access secrets
-- AI tools and automation cannot exfiltrate decrypted values
 
 <Aside type="caution" title="Lightweight Protection">
-  This flag raises the bar for automated attacks but is not a complete defense. An attacker with code execution could bypass dotsecenv and call GPG directly using your key fingerprint (discoverable from the vault).
+  This flag raises the bar for automated attacks but is not a complete defense. A determined attacker with code execution could bypass dotsecenv (e.g. using `script` to fake a TTY) or call GPG directly.
 
-For stronger protection, configure GPG to never cache your passphrase (`default-cache-ttl 0` and `max-cache-ttl 0` in `gpg-agent.conf`). This forces manual passphrase entry via pinentry for every decryption, which most automated tools cannot provide.
+**Stronger Mitigation:** Configure GPG to **never cache your passphrase** (`default-cache-ttl 0` and `max-cache-ttl 0` in `gpg-agent.conf`). This forces manual passphrase entry via `pinentry` for every decryption, which most automated tools cannot provide.
 
 </Aside>
 
-See [Behavior Settings](/docs/concepts/behavior-settings/#require_tty_for_decryption) for configuration details.
+### Protecting .secenv Files
+
+To protect secrets stored in `.secenv` files from unauthorized decryption or finding them plaintext on disk:
+
+1.  **Do not commit** `.secenv` files (add to `.gitignore`).
+2.  **Use the shell plugin** to decrypt secrets only when entering the directory.
+
+This ensures secrets are kept in **environment variables** (memory) rather than written to disk as plaintext. While effectively mitigating file theft, note that this is still vulnerable to **[Environment Snooping](#environment-snooping)** if an attacker has root/process access.
 
 ### PATH Injection Attacks
 
@@ -514,16 +520,16 @@ The vault is designed to be safe in public repositories:
 
 ## Summary
 
-| Threat                 | Protected? | Notes                                   |
-| ---------------------- | ---------- | --------------------------------------- |
-| Git exposure           | Yes        | Encrypted at rest                       |
-| File theft             | Yes        | Requires private key                    |
-| Tampering              | Yes        | Signature verification                  |
-| Weak algorithms        | Yes        | Config-enforced minimums                |
-| PATH injection         | Yes        | Configure absolute `gpg.program` path   |
-| Stealth network egress | Yes        | Hermetic e2e with dual verification     |
-| Automated exfiltration | Partial    | `require_tty_for_decryption` + pinentry |
-| Root access            | No         | OS-level compromise                     |
-| Key theft              | No         | Guard your private key                  |
-| Env snooping           | No         | Post-decryption risk                    |
-| Quantum                | No         | Future GPG update                       |
+| Threat                 | Protected? | Notes                                 |
+| ---------------------- | ---------- | ------------------------------------- |
+| Git exposure           | Yes        | Encrypted at rest                     |
+| File theft             | Yes        | Requires private key                  |
+| Tampering              | Yes        | Signature verification                |
+| Weak algorithms        | Yes        | Config-enforced minimums              |
+| PATH injection         | Yes        | Configure absolute `gpg.program` path |
+| Stealth network egress | Yes        | Hermetic e2e with dual verification   |
+| Automated exfiltration | Partial    | `pinentry` (disable gpg-agent cache)  |
+| Root access            | No         | OS-level compromise                   |
+| Key theft              | No         | Guard your private key                |
+| Env snooping           | No         | Post-decryption risk                  |
+| Quantum                | No         | Future GPG update                     |
