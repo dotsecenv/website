@@ -153,8 +153,8 @@ With this enabled:
 
 To protect secrets stored in `.secenv` files from unauthorized decryption or finding them plaintext on disk:
 
-1.  **Do not commit** `.secenv` files (add to `.gitignore`).
-2.  **Use the shell plugin** to decrypt secrets only when entering the directory.
+1. **Do not commit** `.secenv` files (add to `.gitignore`).
+2. **Use the shell plugin** to decrypt secrets only when entering the directory.
 
 This ensures secrets are kept in **environment variables** (memory) rather than written to disk as plaintext. While effectively mitigating file theft, note that this is still vulnerable to **[Environment Snooping](#environment-snooping)** if an attacker has root/process access.
 
