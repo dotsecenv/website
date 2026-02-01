@@ -127,6 +127,31 @@ dotsecenv refuses to encrypt/decrypt with weaker algorithms.
 
 In SUID mode, dotsecenv blocks write operations to prevent privilege escalation attacks. Read operations only.
 
+### Automated Secret Exfiltration
+
+AI coding assistants, build scripts, and other automated tools may attempt to read secrets programmatically. The `require_tty_for_decryption` behavior flag blocks decryption unless running in an interactive terminal:
+
+```yaml
+behavior:
+  require_tty_for_decryption: true
+```
+
+With this enabled:
+
+- Interactive terminal sessions can decrypt secrets normally
+- Piped commands (`echo x | dotsecenv secret get KEY`) are blocked
+- Scripts running without a TTY cannot access secrets
+- AI tools and automation cannot exfiltrate decrypted values
+
+<Aside type="caution" title="Lightweight Protection">
+  This flag raises the bar for automated attacks but is not a complete defense. An attacker with code execution could bypass dotsecenv and call GPG directly using your key fingerprint (discoverable from the vault).
+
+For stronger protection, configure GPG to never cache your passphrase (`default-cache-ttl 0` and `max-cache-ttl 0` in `gpg-agent.conf`). This forces manual passphrase entry via pinentry for every decryption, which most automated tools cannot provide.
+
+</Aside>
+
+See [Behavior Settings](/docs/concepts/behavior-settings/#require_tty_for_decryption) for configuration details.
+
 ### PATH Injection Attacks
 
 dotsecenv supports configuring an **absolute path** to the GPG executable via `gpg.program`. This provides several security benefits:
@@ -489,15 +514,16 @@ The vault is designed to be safe in public repositories:
 
 ## Summary
 
-| Threat                 | Protected? | Notes                                 |
-| ---------------------- | ---------- | ------------------------------------- |
-| Git exposure           | Yes        | Encrypted at rest                     |
-| File theft             | Yes        | Requires private key                  |
-| Tampering              | Yes        | Signature verification                |
-| Weak algorithms        | Yes        | Config-enforced minimums              |
-| PATH injection         | Yes        | Configure absolute `gpg.program` path |
-| Stealth network egress | Yes        | Hermetic e2e with dual verification   |
-| Root access            | No         | OS-level compromise                   |
-| Key theft              | No         | Guard your private key                |
-| Env snooping           | No         | Post-decryption risk                  |
-| Quantum                | No         | Future GPG update                     |
+| Threat                 | Protected? | Notes                                   |
+| ---------------------- | ---------- | --------------------------------------- |
+| Git exposure           | Yes        | Encrypted at rest                       |
+| File theft             | Yes        | Requires private key                    |
+| Tampering              | Yes        | Signature verification                  |
+| Weak algorithms        | Yes        | Config-enforced minimums                |
+| PATH injection         | Yes        | Configure absolute `gpg.program` path   |
+| Stealth network egress | Yes        | Hermetic e2e with dual verification     |
+| Automated exfiltration | Partial    | `require_tty_for_decryption` + pinentry |
+| Root access            | No         | OS-level compromise                     |
+| Key theft              | No         | Guard your private key                  |
+| Env snooping           | No         | Post-decryption risk                    |
+| Quantum                | No         | Future GPG update                       |
