@@ -21,6 +21,7 @@ Behavior settings are configured in your `~/.config/dotsecenv/config.yaml` file 
 behavior:
   require_explicit_vault_upgrade: false
   restrict_to_configured_vaults: false
+  require_tty_for_decryption: false
 ```
 
 ## Available Settings
@@ -63,6 +64,45 @@ Controls whether CLI `-v` flags can override vaults specified in the configurati
 behavior:
   restrict_to_configured_vaults: true
 ```
+
+### `require_tty_for_decryption`
+
+Controls whether secret decryption requires an interactive terminal (TTY).
+
+| Value | Behavior |
+|-------|----------|
+| `false` (default) | Secrets can be decrypted in any context (TTY or piped/automated) |
+| `true` | Secrets can only be decrypted from an interactive terminal |
+
+**Use case:** Set to `true` to prevent automated tools (CI scripts, AI coding assistants, cron jobs) from programmatically accessing secrets.
+
+```yaml
+behavior:
+  require_tty_for_decryption: true
+```
+
+When enabled, non-TTY decryption attempts fail with exit code 8:
+
+```shell
+$ echo "ignored" | dotsecenv secret get MY_SECRET
+secret decryption blocked: TTY required but not detected (behavior.require_tty_for_decryption is enabled)
+```
+
+<Aside type="tip">
+  This setting only affects `secret get` (decryption). `secret put` continues to work with piped input,
+  allowing workflows like `echo "value" | dotsecenv secret put KEY`.
+</Aside>
+
+<Aside type="caution" title="Security Limitations">
+  This is a **lightweight security mechanism** that raises the bar for automated attacks, but does not make them impossible.
+
+  A determined attacker with code execution on your machine could bypass dotsecenv entirely by:
+
+  1. Discovering your GPG key fingerprint from the vault or config file
+  2. Calling GPG directly to decrypt the secret material
+
+  For stronger protection, configure GPG to **never cache your passphrase** so that every decryption operation requires manual passphrase entry via pinentry. See your GPG agent configuration (`gpg-agent.conf`) and set `default-cache-ttl 0` and `max-cache-ttl 0`.
+</Aside>
 
 ## Simplified Behaviors
 
@@ -122,6 +162,7 @@ If you currently use `strict: true`, here's how to migrate:
     behavior:
       require_explicit_vault_upgrade: true
       restrict_to_configured_vaults: true
+      require_tty_for_decryption: true
 
     gpg:
       program: /usr/bin/gpg  # Or PATH
@@ -168,6 +209,7 @@ vault:
   - /secure/path/to/vault
 behavior:
   restrict_to_configured_vaults: true
+  require_tty_for_decryption: true
 gpg:
   program: /usr/bin/gpg
 ```
