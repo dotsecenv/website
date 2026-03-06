@@ -286,6 +286,16 @@ Every setting can be configured via a CLI flag or an environment variable. CLI f
 8. **Installs the shell plugin** — Clones to `~/.local/share/dotsecenv/plugin/` by default (or system share path with `--system`). Additionally integrates with detected plugin managers (Oh My Zsh, Zinit, Antidote, Oh My Bash, Fisher, Oh My Fish). Fish `conf.d` is linked automatically if fish is present.
 9. **Installs the Terraform credentials helper** — To `~/.terraform.d/plugins/` by default (or system share path with `--system`). Skip with `--no-install-tf-credentials-helper`
 
+#### Install Paths
+
+| Component | Default (user) | `--system` (macOS) | `--system` (Linux) |
+|-----------|---------------|--------------------|--------------------|
+| Binary | `~/.local/bin/` | `/usr/local/bin/` | `/usr/local/bin/` |
+| Completions | `~/.local/share/` | `/usr/local/share/` | `/usr/share/` |
+| Man pages | `~/.local/share/man/man1/` | `/usr/local/share/man/man1/` | `/usr/local/share/man/man1/` |
+| Shell plugin | `~/.local/share/dotsecenv/plugin/` | `/usr/local/share/dotsecenv/plugin/` | `/usr/share/dotsecenv/plugin/` |
+| TF helper | `~/.terraform.d/plugins/` | `/usr/local/share/terraform/plugins/` | `/usr/share/terraform/plugins/` |
+
 #### Examples
 
 **CI/CD: Install specific version, skip interactive components:**
