@@ -24,7 +24,7 @@ Several tools address parts of this problem, and they're all good at what they d
 
 **[direnv](https://direnv.net/)** provides the shell integration developers want - environment variables load automatically when you `cd` into a project. But it provides zero encryption. Your secrets are still plaintext in `.envrc`.
 
-**[HashiCorp Vault](https://www.vaultproject.io/), [Doppler](https://www.doppler.com/), [Infisical](https://infisical.com/)** are powerful platforms with dynamic secrets, rotation, and web dashboards. They're the right choice for production. But they require server infrastructure or SaaS accounts — overhead that doesn't make sense when a developer just needs to share an API key with a teammate.
+**[HashiCorp Vault](https://www.vaultproject.io/), [Doppler](https://www.doppler.com/), [Infisical](https://infisical.com/)** are powerful platforms with dynamic secrets, rotation, and web dashboards. They're the right choice for production. But they require server infrastructure or SaaS accounts -- overhead that doesn't make sense when a developer just needs to share an API key with a teammate.
 
 **[git-crypt](https://github.com/AGWA/git-crypt)** encrypts files transparently in git, but operates at the file level with no per-secret granularity and no sharing workflow.
 
@@ -46,7 +46,7 @@ dotsecenv secret get API_KEY
 dotsecenv secret share API_KEY teammate@company.com
 ```
 
-A shell plugin for zsh, bash, and fish decrypts and loads secrets when you enter a directory — like direnv, but your secrets stay encrypted on disk:
+A shell plugin for zsh, bash, and fish decrypts and loads secrets when you enter a directory - like direnv, but your secrets stay encrypted on disk:
 
 ```bash
 # .secenv file (safe to commit)
@@ -62,9 +62,9 @@ echo $API_KEY  # decrypted on-demand
 
 I chose GPG over [age](https://github.com/FiloSottile/age) because **GPG provides signatures**, which age deliberately omits. Signatures enable:
 
-- **Verifying who created each secret** — every vault entry is signed by the originator's key
-- **Tamper detection** — `dotsecenv validate` checks cryptographic integrity
-- **Non-repudiation** — audit trails with provable authorship
+- **Verifying who created each secret** -- every vault entry is signed by the originator's key
+- **Tamper detection** --`dotsecenv validate` checks cryptographic integrity
+- **Non-repudiation** --audit trails with provable authorship
 
 Many developers already have a GPG key for [commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits). dotsecenv builds on that existing infrastructure.
 If, however, you don't have a GPG key, you can generate one with [`dotsecenv identity create`](/reference/#identity-create), without needing to get into the GPG nitty-gritty!
@@ -75,12 +75,12 @@ Algorithm defaults align with [FIPS 186-5](https://dotsecenv.com/concepts/compli
 
 I want to be upfront about the boundaries:
 
-- **Process memory**: once secrets are loaded as environment variables, they're readable via `/proc` or memory dumps. The Trivy attack also dumped `Runner.Worker` process memory — encryption at rest doesn't help there.
+- **Process memory**: once secrets are loaded as environment variables, they're readable via `/proc` or memory dumps. The Trivy attack also dumped `Runner.Worker` process memory -- encryption at rest doesn't help there.
 - **Compromised GPG private key**: if your private key is stolen and unprotected, your secrets are exposed.
 - **Root/admin access**: a privileged attacker can read anything.
 - **Production runtime**: dotsecenv targets the development lifecycle (SDLC), not production secret injection. For production, use Vault, AWS Secrets Manager, or similar.
 
-dotsecenv is **defense-in-depth** — it eliminates the plaintext-on-disk attack surface. If the Trivy attacker's disk sweep had found GPG ciphertext instead of plaintext `.env` files, that component of the attack would have yielded nothing usable, or at the very least made the exfiltration much harder to effect.
+dotsecenv is **defense-in-depth** -- it eliminates the plaintext-on-disk attack surface. If the Trivy attacker's disk sweep had found GPG ciphertext instead of plaintext `.env` files, that component of the attack would have yielded nothing usable, or at the very least made the exfiltration much harder to effect.
 
 ## Current state
 
