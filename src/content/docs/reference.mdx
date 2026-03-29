@@ -273,9 +273,8 @@ sharing secrets. If the identity already exists in a vault it is skipped.
 | `--all` | Add identity to all configured vaults |
 | `-v` | Target vault (path or 1-based index) |
 
-When neither `--all` nor `-v` is specified and only one vault is configured,
-that vault is selected automatically. If multiple vaults are configured you
-must specify which vault(s) to target.
+When neither `--all` nor `-v` is specified, the vault is auto-selected if only
+one is configured, or you are prompted to choose interactively.
 
 The identity's public key is fetched from GPG, validated against the
 configured `approved_algorithms`, signed, and appended to the vault.
