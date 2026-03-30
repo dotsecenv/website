@@ -277,7 +277,10 @@ When neither `--all` nor `-v` is specified, the vault is auto-selected if only
 one is configured, or you are prompted to choose interactively.
 
 The identity's public key is fetched from GPG, validated against the
-configured `approved_algorithms`, signed, and appended to the vault.
+configured `approved_algorithms`, and appended to the vault. The entry is
+signed by the current user's key (the person running the command), so you
+do not need the target's private key — only their public key in your GPG
+keyring.
 
 **Examples:**
 
