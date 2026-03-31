@@ -114,6 +114,7 @@ GUI-based pinentry programs work because they open their own window, independent
 Beyond triggering GPG decryption indirectly, an attacker with code execution can extract the plaintext GPG passphrase directly from the OS keychain:
 
 **macOS (Login Keychain):**
+
 ```bash
 # Extracts plaintext passphrase with zero user interaction
 security find-generic-password -s "GnuPG" -g
@@ -122,6 +123,7 @@ security find-generic-password -s "GnuPG" -g
 The macOS Login Keychain unlocks when the user logs in and remains accessible to all processes running as that user. While keychain ACLs can restrict which applications can use stored credentials for cryptographic operations, the `security` CLI (an Apple-signed system binary) can retrieve password values directly.
 
 **Linux (GNOME Keyring):**
+
 ```bash
 # Extracts stored secrets via D-Bus
 secret-tool lookup xdg:schema org.gnupg.Passphrase
@@ -190,6 +192,7 @@ no-allow-external-cache
 **For maximum security** (e.g., production secrets), set both TTLs to `0` to force passphrase entry on every operation.
 
 **For convenience** during development, the 1hr/4hr configuration above ensures that:
+
 - You enter your passphrase at most once per work session
 - The passphrase is never persisted to disk or OS keychain
 - An AI agent can only decrypt while the cache is warm (limited window)
