@@ -1,0 +1,142 @@
+---
+title: Claude Code
+description: Use dotsecenv with Claude Code to manage secrets from your AI coding assistant
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Goal
+
+Install the dotsecenv plugin for [Claude Code](https://claude.ai/claude-code) so your AI coding assistant can list, retrieve, store, share, and revoke GPG-encrypted secrets.
+
+## Prerequisites
+
+- [dotsecenv installed](/tutorials/installation/) and available on your PATH
+- A GPG key with your passphrase cached in gpg-agent (or macOS Keychain)
+- [Claude Code](https://claude.ai/claude-code) installed (CLI, desktop app, or IDE extension)
+
+## Steps
+
+<Steps>
+
+1. **Add the dotsecenv marketplace**
+
+   In Claude Code, run:
+
+   ```text
+   /plugin marketplace add dotsecenv/dotsecenv
+   ```
+
+2. **Install the plugin**
+
+   ```text
+   /plugin install dotsecenv@dotsecenv
+   ```
+
+   This registers the `/dotsecenv:secrets` skill, which teaches Claude how to use the dotsecenv CLI safely.
+
+3. **Verify GPG is ready**
+
+   The plugin checks your GPG configuration on first use. If your passphrase is not cached, Claude will ask you to warm the cache:
+
+   ```bash
+   ! gpg --sign --local-user YOUR_FINGERPRINT </dev/null
+   ```
+
+   The `!` prefix runs the command in your terminal so pinentry can prompt for your passphrase.
+
+4. **Use it**
+
+   Ask Claude to work with your secrets naturally:
+
+   - *"List my secrets"* — lists secret keys without decrypting values
+   - *"Show me the value of myapp/API\_KEY"* — decrypts a specific secret
+   - *"Store a new secret called myapp/DB\_PASSWORD"* — encrypts and stores a value
+   - *"Share myapp/API\_KEY with fingerprint ABC123"* — re-encrypts for another team member
+
+</Steps>
+
+## Expected Result
+
+After installation, Claude can manage your dotsecenv secrets through natural language. The plugin enforces a security model that prevents Claude from decrypting secrets unless you explicitly ask.
+
+```text
+You: list my secrets
+
+Claude: Running dotsecenv secret get...
+
+  myapp/API_KEY
+  myapp/DB_PASSWORD
+  staging/JWT_SECRET
+
+You have 3 secrets across 1 vault.
+```
+
+## How It Works
+
+The plugin provides a skill that teaches Claude:
+
+- **Which commands are safe** — listing secrets, describing vaults, and running health checks never trigger GPG decryption
+- **When to ask first** — decryption and mutation require your explicit request
+- **How to detect problems** — if your GPG pinentry is terminal-based or your passphrase is not cached, Claude warns you upfront instead of failing silently
+
+### GPG Pinentry Compatibility
+
+Claude Code runs shell commands without a terminal, which affects how GPG passphrase prompts work:
+
+| Pinentry Program | Works with Claude Code? | Notes |
+|------------------|------------------------|-------|
+| `pinentry-mac` | Yes | GUI-based. Passphrase returned silently from Keychain or gpg-agent cache. |
+| `pinentry-gnome3` | Yes | GUI-based. Needs a display server. |
+| `pinentry-qt` | Yes | GUI-based. Needs a display server. |
+| `pinentry-tty` | No | Requires terminal input that Claude cannot provide. |
+| `pinentry-curses` | No | Requires terminal input that Claude cannot provide. |
+
+If you use a terminal-based pinentry, you have two options:
+
+1. **Switch to a GUI pinentry** — set `pinentry-program` in `~/.gnupg/gpg-agent.conf`
+2. **Pre-cache your passphrase** before asking Claude to decrypt:
+
+   ```bash
+   ! gpg --sign --local-user YOUR_FINGERPRINT </dev/null
+   ```
+
+### Security Model
+
+The plugin enforces four tiers of operations:
+
+| Tier | Operations | Behavior |
+|------|-----------|----------|
+| Safe | List secrets, describe vaults, validate, health checks | Claude runs freely |
+| Decrypt | Retrieve a secret value | Only when you explicitly ask |
+| Mutate | Store, share, revoke, forget | Claude confirms before executing |
+| Prohibited | Keychain extraction, exfiltration, init/login | Never executed |
+
+<Aside type="caution" title="GPG Agent Security">
+  When your GPG passphrase is cached, any process running as your user can trigger decryption — including AI agents. For stronger protection, see the [recommended GPG agent hardening](/concepts/threat-model/#recommended-gpg-agent-configuration) in the threat model.
+</Aside>
+
+## Variations
+
+### Local Development (without marketplace)
+
+If you are developing dotsecenv locally, you can load the plugin directly from a checkout:
+
+```bash
+claude --plugin-dir /path/to/dotsecenv
+```
+
+### Uninstalling
+
+```text
+/plugin uninstall dotsecenv@dotsecenv
+/plugin marketplace remove dotsecenv
+```
+
+---
+
+## Next Steps
+
+- [Threat Model — AI Agent Security](/concepts/threat-model/#ai-coding-agents-and-gpg) — understand the security implications
+- [Your First Secret](/tutorials/first-secret/) — get started with dotsecenv
+- [Shell Plugins](/guides/shell-plugins/) — auto-load secrets when entering directories
