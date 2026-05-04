@@ -84,7 +84,7 @@ vault_path: /srv/secrets/team-platform/
 
 A user config that gets partially filtered (an unapproved algorithm and an out-of-bounds vault path):
 
-```
+```console
 $ dotsecenv vault list
 warning: ignoring algorithm `rsa2048` (not in policy allowed_algorithms)
 warning: ignoring vault_path `/home/alice/secrets/` (outside policy mandatory_vault_path /srv/secrets/)
